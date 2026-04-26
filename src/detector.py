@@ -9,7 +9,7 @@ This module provides comprehensive news credibility analysis using:
 - Heuristic analysis (clickbait, sensationalism detection)
 - Political bias detection
 
-Author: TruthLens Team
+Author: TruthLens 
 Version: 2.0
 """
 

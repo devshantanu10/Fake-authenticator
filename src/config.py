@@ -65,25 +65,55 @@ TRUSTED_SOURCES = [
         "name": "Onlinekhabar",
         "rss": "https://www.onlinekhabar.com/feed",
         "reliability_score": 0.95,
-        "category": "General News"
+        "category": "General"
     },
     {
         "name": "Setopati",
         "rss": "https://www.setopati.com/feed",
         "reliability_score": 0.93,
-        "category": "General News"
+        "category": "General"
     },
     {
-        "name": "Kathmandu Post",
-        "rss": "https://kathmandupost.com/rss",
-        "reliability_score": 0.92,
-        "category": "General News"
+        "name": "Ratopati",
+        "rss": "https://www.ratopati.com/feed",
+        "reliability_score": 0.90,
+        "category": "Politics"
     },
     {
         "name": "Nagarik News",
-        "rss": "https://nagariknews.com/feed",
-        "reliability_score": 0.90,
-        "category": "General News"
+        "rss": "https://nagariknews.nagariknetwork.com/rss/1.xml",
+        "reliability_score": 0.92,
+        "category": "General"
+    },
+    {
+        "name": "Annapurna Post",
+        "rss": "https://annapurnapost.com/rss",
+        "reliability_score": 0.91,
+        "category": "General"
+    },
+    {
+        "name": "Khabarhub",
+        "rss": "https://english.khabarhub.com/feed",
+        "reliability_score": 0.89,
+        "category": "Politics"
+    },
+    {
+        "name": "The Himalayan Times",
+        "rss": "https://thehimalayantimes.com/feed",
+        "reliability_score": 0.94,
+        "category": "International"
+    },
+    {
+        "name": "MyRepublica",
+        "rss": "https://myrepublica.nagariknetwork.com/rss/1.xml",
+        "reliability_score": 0.92,
+        "category": "Business"
+    },
+    {
+        "name": "BBC Nepali",
+        "rss": "https://www.bbc.com/nepali/index.xml",
+        "reliability_score": 0.98,
+        "category": "International"
     }
 ]
 
@@ -160,6 +190,10 @@ CLICKBAIT_TRIGGERS = [
     "खुलासा",      # Revelation
     "आश्चर्यजनक",  # Surprising
     "ब्रेकिङ्ग",    # Breaking
+    "दुखद",        # Sad (common clickbait)
+    "यस्तो खबर",    # This news (common clickbait)
+    "अमेरिकाबाट",   # From America (diaspora fake news)
+    "पक्राउ",      # Arrest (often used in fake news about celebs)
     "BREAKING",
     "EXCLUSIVE",
     "SHOCKING",

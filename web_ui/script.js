@@ -125,6 +125,28 @@ const MOCK_NEWS = [
     }
 ];
 
+const DISPLAY_NEWS_COUNT = 10;
+let currentNews = [];
+
+function shuffleArray(array) {
+    const copied = array.slice();
+    for (let i = copied.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copied[i], copied[j]] = [copied[j], copied[i]];
+    }
+    return copied;
+}
+
+function getRandomNews(count = DISPLAY_NEWS_COUNT) {
+    const shuffled = shuffleArray(MOCK_NEWS);
+    return shuffled.slice(0, Math.min(count, shuffled.length));
+}
+
+function getFreshNewsFeed() {
+    currentNews = getRandomNews();
+    return currentNews;
+}
+
 // ── DOM ──
 const loginPage    = document.getElementById('login-page');
 const dashPage     = document.getElementById('dashboard-page');
@@ -146,8 +168,9 @@ const trendingContainer   = document.getElementById('trending-container');
 // ── Init ──
 function init() {
     updateSyncTime();
+    getFreshNewsFeed();
     renderNewsFeed();
-    renderTrending();
+    renderTrending(currentNews);
 }
 
 function updateSyncTime() {
@@ -203,10 +226,10 @@ function doLogout() {
 if (logoutBtn) logoutBtn.addEventListener('click', doLogout);
 
 // ── Render News Feed ──
-function renderNewsFeed() {
+function renderNewsFeed(newsList = currentNews) {
     if (!newsContainer) return;
     newsContainer.innerHTML = '';
-    MOCK_NEWS.forEach((news, index) => {
+    newsList.forEach((news, index) => {
         const card = document.createElement('div');
         const isSuspect = news.category === 'संदिग्ध';
         card.className = 'news-card' + (isSuspect ? ' card-suspect' : '');
@@ -260,10 +283,10 @@ function getCategoryColor(cat) {
 }
 
 // ── Render Trending ──
-function renderTrending() {
+function renderTrending(newsList = currentNews) {
     if (!trendingContainer) return;
     trendingContainer.innerHTML = '';
-    const suspicious = MOCK_NEWS.filter(n =>
+    const suspicious = newsList.filter(n =>
         n.category === 'संदिग्ध' || n.title.includes("ALIEN") || n.description.includes("Shocking") || n.description.includes("secret") || n.description.includes("BREAKING")
     );
     if (suspicious.length > 0) {
@@ -286,7 +309,7 @@ function renderTrending() {
 
 // ── Verify News ──
 window.verifyNews = function(index, btnEl) {
-    const news = MOCK_NEWS[index];
+    const news = currentNews[index];
     const resContainer = document.getElementById(`verdict-res-${index}`);
 
     btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> जाँच भइरहेको छ...';
@@ -405,7 +428,9 @@ const refreshBtn = document.getElementById('refresh-btn');
 if (refreshBtn) {
     refreshBtn.addEventListener('click', () => {
         updateSyncTime();
+        getFreshNewsFeed();
         renderNewsFeed();
+        renderTrending(currentNews);
     });
 }
 

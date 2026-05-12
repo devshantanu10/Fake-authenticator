@@ -1,0 +1,46 @@
+# TruthLens Nepal: Model Training, Backend Logic, and Web App Workflow
+
+This document explains the underlying architecture, model training procedures, and workflow of the TruthLens Nepal Fake News Detector.
+
+## 1. How the Model is Trained
+The machine learning model training is handled in `train_model.py`. The steps are as follows:
+
+*   **Data Ingestion**: The system loads two CSV files from the `data/` directory: `True.csv` and `Fake.csv`.
+*   **Labeling**: Articles from `Fake.csv` are assigned the label `1` (Fake), and `True.csv` articles get `0` (True).
+*   **Data Cleaning (`clean_text`)**: 
+    *   Converts text to lowercase.
+    *   Removes special characters using regular expressions, specifically preserving Devanagari (Nepali) characters (`\u0900-\u097F`) and English alphabets (`a-z`).
+    *   Strips out extra whitespace.
+*   **Data Splitting**: The dataset is split into 80% training and 20% testing sets using `train_test_split`.
+*   **Pipeline Setup**: An Scikit-Learn `Pipeline` is used, comprising two main steps:
+    1.  **TF-IDF Vectorizer**: Converts the text into numerical vectors. It considers the top 10,000 features, removes English stop words, and looks at both unigrams and bigrams (`ngram_range=(1,2)`).
+    2.  **Logistic Regression Classifier**: A statistical model configured with `max_iter=1000` to classify the vectorized text.
+*   **Evaluation & Persistence**: The model evaluates its accuracy on the test set, prints a classification report, and serializes the complete pipeline (along with the individual classifier and vectorizer) using `joblib` into the `outputs/` folder.
+
+---
+
+## 2. Backend Logic (Authenticity Detection)
+The core intelligence lives in `src/detector.py`, which evaluates news text using a **Multi-Phase Consensus System**:
+
+*   **Phase 1: Database Lookup**: The system first checks if the exact text (or a substantial substring) already exists in the known `True.csv` or `Fake.csv` datasets. If there's an exact match, it immediately returns a 100% confidence verdict.
+*   **Phase 2: Live News Cross-Reference**: The cleaned input is cross-referenced against recently scraped live news from trusted sources. If over 40% of the keywords match an ongoing live news report, it's flagged as highly credible.
+*   **Phase 3: Heuristic Analysis**: Rule-based checks are applied to look for clickbait triggers, sensationalism markers, and excessive use of ALL CAPS text. This generates a "Heuristic Score" representing emotional manipulation.
+*   **Phase 4: ML Prediction**: The text is fed into the loaded Logistic Regression ML pipeline, outputting a probability (0 to 1) of the text being fake.
+*   **Phase 5: Final Consensus**: The system applies weights to combine the ML Score and the Heuristic Score. If the source was verified in Phase 2, the ML "fake probability" is heavily discounted. Finally, if the combined score crosses a threshold (default 0.5), it labels the article as **Uncredible**, otherwise **Credible**. It also returns the "Forensic Reasons" for its decision.
+
+---
+
+## 3. Web App Workflow
+There are two interfaces for the application: the **Python (Streamlit) App** and the **Static Frontend (GitHub Pages)**.
+
+### A. Python Streamlit App (`app.py`) - Full Backend
+*   **Login Portal**: Users log in as either "Citizen Access" or "Official Admin".
+*   **Live Feed**: Scrapes real-time Nepali news (via `src/fetcher.py`). Users can click "Verify", which triggers the `predict_authenticity` pipeline described above.
+*   **Forensic Scan**: Users can paste raw text or a URL. The backend scrapes the URL, analyzes the text using all 5 phases, and outputs a detailed forensic report.
+*   **Admin Dashboard (Admins Only)**: Allows administrators to view database statistics, track model accuracy, and trigger the model retraining pipeline (`train_model.py`) via the UI.
+
+### B. Static Deployed App (`web_ui/` folder) - GitHub Pages
+*   **Static Nature**: Since GitHub Pages only supports static files (HTML, CSS, JS), it cannot run the Python ML pipeline or scrape live news dynamically.
+*   **Mock Data**: The frontend loads a mock list of Nepali news articles (`MOCK_NEWS`), tagged with categories like Politics, Tech, and Suspicious.
+*   **Simulated Verification (`script.js`)**: When a user clicks "Verify" or scans a custom text, the JavaScript runs a localized heuristic check. It looks for predefined Nepali/English trigger words (e.g., "alien", "shocking", "भर्खरै", "ब्रेकिङ्ग"). 
+*   **UX Experience**: The UI simulates the forensic loading experience and visually renders the Credible/Uncredible verdicts and the forensic reasoning based on the simulated logic, providing a seamless "demo" experience without a live server.

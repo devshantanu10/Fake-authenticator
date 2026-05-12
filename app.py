@@ -206,7 +206,10 @@ def render_live_feed():
                 st.markdown(f'''
                     <div class="news-card">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <span class="source-badge">{article["source"]}</span>
+                            <div>
+                                <span class="source-badge">{article["source"]}</span>
+                                <span style="background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; color: #A0AEC0; margin-left: 5px;">{article.get("category", "General")}</span>
+                            </div>
                             <a href="{article['link']}" target="_blank" style="color: var(--accent-blue); text-decoration: none; font-size: 0.8rem; font-weight: 600;">🌐 VIEW SOURCE</a>
                         </div>
                         <h3>{article["title"]}</h3>
